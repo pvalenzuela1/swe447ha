@@ -1,32 +1,30 @@
-var gl = null;
-var cone = null;
+<html>
+<head>
+  <script src="../Common/webgl-utils.js"></script>
+  <script src="../Common/initShaders.js"></script>
+<script src="../Common/Cone.js"></script>
+<script src="cone.js"></script> 
 
-function init() {
-
-    var canvas = document.getElementById( "webgl-canvas" );
-
-    gl = WebGLUtils.setupWebGL( canvas );
-
-    if ( !gl ) {
-        alert("Unable to setup WebGL");
-        return;
-    }
-    try
-    {
-    gl.clearColor( 1.0, 0.0, 0.0, 1.0 );
-    //cone = initShaders(cone, "Cone-vertex-shader", "Cone-fragment-shader"); //not working for me
-    cone = new Cone(100);
-    render();
-    }
-    catch(e)
-    {
-        alert(e.message);
-    }
+<script id = "Cone-vertex-shader" type = "x-shader/x-vertex">
+attribute vec4 vPosition;
+void main()
+{
+	//gl_Position = vPosition;
+	gl_PointSize = 5.0;
+	gl_Position = vPosition;
 }
+</script>
 
-function render() {
-    gl.clear( gl.COLOR_BUFFER_BIT );
-    cone.render();
+<script id = "Cone-fragment-shader" type="x-shader/x-fragment">
+precision highp float;
+void main()
+{
+	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }
+</script>
 
-window.onload = init;
+</head>
+<body>
+  <canvas id="webgl-canvas" width="512" height="512" style="background-color: #0000FF"></canvas>
+</body>
+</html>
