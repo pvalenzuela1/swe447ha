@@ -1,5 +1,5 @@
 var gl = null;
-var cone;
+var cone = null;
 
 function init() {
     var canvas = document.getElementById( "webgl-canvas" );
@@ -11,16 +11,15 @@ function init() {
         return;
     }
 
-    gl.clearColor( 1.0, 0.0, 1.0, 1.0 );
+    gl.clearColor( 0.45, 0.35, 0.45, 1.0 );
+    cone = new Cone(150);
 
-	cone = new Cone(gl, 100);
     render();
 }
 
 function render() {
-	
     gl.clear( gl.COLOR_BUFFER_BIT );
-	cone.render();
+    cone.render();
 }
 
 window.onload = init;
