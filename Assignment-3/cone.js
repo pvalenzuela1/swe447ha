@@ -2,6 +2,7 @@ var gl = null;
 var cone = null;
 
 function init() {
+
     var canvas = document.getElementById( "webgl-canvas" );
 
     gl = WebGLUtils.setupWebGL( canvas );
@@ -10,11 +11,17 @@ function init() {
         alert("Unable to setup WebGL");
         return;
     }
-
-    gl.clearColor( 0.45, 0.35, 0.45, 1.0 );
-    cone = new Cone(150);
-
+    try
+    {
+    gl.clearColor( 1.0, 0.0, 0.0, 1.0 );
+    //cone = initShaders(cone, "Cone-vertex-shader", "Cone-fragment-shader"); //not working for me
+    cone = new Cone(100);
     render();
+    }
+    catch(e)
+    {
+        alert(e.message);
+    }
 }
 
 function render() {
