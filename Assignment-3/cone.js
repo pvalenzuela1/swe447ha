@@ -1,4 +1,4 @@
-ar cone = null;
+var cone = null;
 var gl = null;
 
 function init() {
