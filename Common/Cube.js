@@ -31,6 +31,47 @@ function Cube( vertexShaderId, fragmentShaderId ) {
         numComponents : 3
     };
     
+	this.colors = {
+        values : new Float32Array([
+		//FRONT FACE
+	  	0.9,  0.5,  0.2,
+   		0.9,  0.3,  0.3,
+   		0.7,  0.5,  0.4,
+   		0.9,  0.2,  0.5,
+  
+ 	 	// BACK FACE
+  		0.75, 0.2, 0.5,
+  		0.5, 0.3, 0.3,
+  		0.75, 0.4, 0.5,
+  		0.4, 0.5, 0.5,
+  
+ 	 	// TOP FACE
+  		0.5,  0.2, 0.2,
+  		0.5,  0.3, 0.2,
+  		0.5,  0.4, 0.2,
+  		0.5,  0.5, 0.2,
+  
+ 	 	// BOTTOM FACE
+  		0.2, 0.0, 0.75,
+  		0.3, 0.0, 0.7,
+  		0.4, 0.0,  0.65,
+  		0.5, 0.0,  0.55,
+  
+ 	 	// RIGHT FACE
+   		0.3,  0.8,  0.0,
+   		0.3,  0.5,  0.3,
+   		0.2,  0.8,  0.0,
+   		0.3,  0.9,  0.6,
+  
+  		// LEFT FACE
+   		0.2,  0.8, 0.2,
+   		0.3,  0.8, 0.2,
+   		0.2,  0.8, 0.5,
+   		0.2,  0.8, 0.2
+        ]),
+        numComponents : 3 
+    };	
+	
     this.indices = { 
         values : new Uint16Array([
 			0, 1, 2,
