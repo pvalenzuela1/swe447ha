@@ -32,6 +32,22 @@ void main()
     gl_FragColor = vec4(fColor, 1.0);
 }
 </script>
+    
+    //button stuff
+    var rotationAxis;
+var xAxis = [1, 0, 0];
+var yAxis = [0, 1, 0];
+...
+function init() {
+ ...
+ document.getElementById("xButton").onclick = function() {
+ consol.log("Someone Pressed the Button");
+ }
+}
+function render() {
+ ...
+ ms.rotate( speed * angle, rotationAxis );
+} 
 </head>
 
 <body>
