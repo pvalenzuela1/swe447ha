@@ -33,7 +33,13 @@ void main()
 }
 </script>
     
-    //button stuff
+ 
+</head>
+
+<body>
+<button id="xButton">Rotate X</button> 
+    
+       //button stuff
     var rotationAxis;
 var xAxis = [1, 0, 0];
 var yAxis = [0, 1, 0];
@@ -48,9 +54,6 @@ function render() {
  ...
  ms.rotate( speed * angle, rotationAxis );
 } 
-</head>
-
-<body>
 <canvas id="webgl-canvas" width="512" height="512" style="background-color: #0000FF"></canvas>
 </body>
 </html>
