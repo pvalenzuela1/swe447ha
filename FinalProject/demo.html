@@ -1,0 +1,291 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <script src="./js/lib/babylon.js"></script>
+    <link rel="stylesheet" type="text/css" href="style/style.css">
+    <script>
+        var _ctx, _canvas, _engine, _scene, _light, _light2, _camera, _material, _mesh, canMain, _isFinish = false;
+        var _boxW;
+        var _rotationAxis = "-";
+        function _onload() {
+            _canvas = document.getElementById("can3D");
+
+            _engine = new BABYLON.Engine(_canvas);
+            _scene = new BABYLON.Scene(_engine);
+            // _scene.clearColor = BABYLON.Color3.Black;
+            _scene.clearColor = BABYLON.Color3(1,0,0);
+
+            _camera = new BABYLON.ArcRotateCamera("camera", 0, 0, 0, BABYLON.Vector3.Zero(), _scene);
+            _camera.setPosition(new BABYLON.Vector3(0, 0, -400));
+            _camera.attachControl(_canvas);
+            _camera.inputs.attached.keyboard.detachControl();
+
+            _light = new BABYLON.PointLight("light", new BABYLON.Vector3(0, 300, -300), _scene);
+            _light.intensity = 1;
+            _light2 = new BABYLON.PointLight("light2", new BABYLON.Vector3(0, -300, 300), _scene);
+            _light2.intensity = 1;
+
+            _material = new BABYLON.StandardMaterial("material", _scene);
+            _material.diffuseColor = new BABYLON.Color3.FromHexString(selColor.value);
+
+            _boxW = BABYLON.MeshBuilder.CreateBox("box", {height: 0.01}, _scene);
+
+            _engine.runRenderLoop(function () {
+                if (_isFinish) {
+                    _renderLoop();
+                    _scene.render();
+                }
+            });
+        };
+
+        function _renderLoop(){
+            // _mesh.rotate(BABYLON.Axis.Y, 0.01, BABYLON.Space.WORLD);
+            if(_rotationAxis == "x"){
+                _boxW.rotate(BABYLON.Axis.X, 0.01, BABYLON.Space.WORLD);
+            }else if(_rotationAxis == "y"){
+                _boxW.rotate(BABYLON.Axis.Y, 0.01, BABYLON.Space.WORLD);
+            }else if(_rotationAxis == "z"){
+                _boxW.rotate(BABYLON.Axis.Z, 0.01, BABYLON.Space.WORLD);
+            }
+            // _boxW.rotate(BABYLON.Axis.Y, 0.01, BABYLON.Space.WORLD);
+            // _camera.rotate(BABYLON.Axis.Y, 0.01, BABYLON.Space.WORLD);
+        }
+
+        function _redraw() {
+            _isFinish = false;
+            _ctx.font = selStyle.value + " " + selVariant.value + " " + selWeight.value + " " + selSize.value + " " + selFamily.value;
+            
+            _ctx.clearRect(0, 0, canMain.width, canMain.height);
+            _ctx.fillText(txtText.value, 0, 0);
+        }
+        function _text3d(data, scale, thick, material, x, y, z) {
+            var lenX = 0, lenY = 0;
+            var text;
+            for (var i = 0; i < data.length; i++) {
+                var letter = data[i];
+                var conners = [];
+                for (var k = 0; k < letter[0].length; k++) {
+                    conners[k] = new BABYLON.Vector2(scale * letter[0][k][1], scale * letter[0][k][0]);
+                    if (lenX < conners[k].x) lenX = conners[k].x;
+                    if (lenY < conners[k].y) lenY = conners[k].y;
+                }
+                //conners.reverse();
+                var polyBuilder = new BABYLON.PolygonMeshBuilder("pBuilder" + i, conners, _scene);
+
+                for (var j = 1; j < letter.length; j++) {
+                    var hole = [];
+                    for (var k = 0; k < letter[j].length; k++) {
+                        hole[k] = new BABYLON.Vector2(scale * letter[j][k][1], scale * letter[j][k][0]);
+                    }
+                    hole.reverse();
+                    polyBuilder.addHole(hole);
+                }
+                var polygon = polyBuilder.build(false, thick);
+                polygon.material = material;
+                polygon.receiveShadows = true;
+
+                if (text)
+                    polygon.setParent(text);
+                else{
+                    text = polygon;
+                    polygon.setParent(_boxW);
+                }
+            }
+
+            
+
+            text.position.x = -lenY / 2 + x;
+            text.position.y = lenX / 2 + y;
+            text.position.z = z;
+
+            text.rotation.y = Math.PI / 2;
+            text.rotation.z = -Math.PI / 2;
+            text.lenX = lenX;
+            text.lenY = lenY;
+
+            // text.setPivotPoint(lenY / 2 - x, lenX / 2 - y, -z);
+            // text.setPivotPoint(new BABYLON.Vector3(lenY / 2 - x, lenX / 2 - y, -z));
+            // text.setPivotPoint(new BABYLON.Vector3(-lenY / 2 + x, lenX / 2 - y, -z).normalize());
+
+            // text.translate(BABYLON.Axis.X, -lenY / 2 + x, BABYLON.Space.LOCAL);
+            // text.translate(BABYLON.Axis.Y, -lenX / 2 + y, BABYLON.Space.LOCAL);
+
+            // text.computeWorldMatrix();
+            // var matrix = text.getWorldMatrix();
+            // var global_position = BABYLON.Vector3.TransformCoordinates(local_position, matrix);
+
+            return text;
+        }
+
+        function _download() {
+            if (_mesh)
+                window.location="data:application/text," + JSON.stringify(BABYLON.SceneSerializer.SerializeMesh(_mesh, false, true));
+            else
+                alert("No output for download. Click Vecterize3D first!");
+        };
+
+        function _changeBackgroundColor(colorParam){
+            console.log(colorParam);
+            //_scene.clearColor = BABYLON.Color3(0,1,0);
+            // _canvas.css('background-color', 'red');
+            _canvas.style.backgroundColor = colorParam;
+            //_material.diffuseColor=BABYLON.Color3.FromHexString(this.value);
+        };
+    </script>
+</head>
+<body onload="_onload()">
+    <br>
+    <br>
+    <canvas id="can3D" class="canvasclass"></canvas>
+    <br>
+    <br>
+    <canvas id="canTemp" width="4500" height="1500" style="display:none"></canvas>
+
+    <br>
+    <hr>
+    <br>
+    <table width="100%" border="1">
+      <tr>
+        <td width="50%"><input class="textinput" id="txtText" value="Sample input text."></input></td>
+        <td width="10%">
+            <!-- <em>Family:</em> -->
+            <select id="selFamily" style="font-family: Verdana;" onchange="this.style.fontFamily=this.value">
+                <option value="Arial" style="font-family:Arial">Arial</option>
+                <option value="Arial Black" style="font-family:Arial Black">Arial Black</option>
+                <option value="Book Antiqua" style="font-family:Book Antiqua">Book Antiqua</option>
+                <option value="Bookman" style="font-family:Bookman">Bookman</option>
+                <option value="Charcoal" style="font-family:Charcoal">Charcoal</option>
+                <option value="Comic Sans MS" style="font-family:Comic Sans MS">Comic Sans MS</option>
+                <option value="Courier" style="font-family:Courier">Courier</option>
+                <option value="Courier New" style="font-family:Courier New">Courier New</option>
+                <option value="Cursive" style="font-family:Cursive">Cursive</option>
+                <option value="Gadget" style="font-family:Gadget">Gadget</option>
+                <option value="Garamond" style="font-family:Garamond">Garamond</option>
+                <option value="Geneva" style="font-family:Geneva">Geneva</option>
+                <option value="Georgia" style="font-family:Georgia">Georgia</option>
+                <option value="Helvetica" style="font-family:Helvetica">Helvetica</option>
+                <option value="Impact" style="font-family:Impact">Impact</option>
+                <option value="Lucida Grande" style="font-family:Lucida Grande">Lucida Grande</option>
+                <option value="Lucida Sans Unicode" style="font-family:Lucida Sans Unicode">Lucida Sans Unicode</option>
+                <option value="Palatino" style="font-family:Palatino">Palatino</option>
+                <option value="Palatino Linotype" style="font-family:Palatino Linotype">Palatino Linotype</option>
+                <option value="Symbol" style="font-family:Symbol">Symbol</option>
+                <option value="Tahoma" style="font-family:Tahoma">Tahoma</option>
+                <option value="Times" style="font-family:Times">Times</option>
+                <option value="Times New Roman" style="font-family:Times New Roman">Times New Roman</option>
+                <option value="Trebuchet MS" style="font-family:Trebuchet MS">Trebuchet MS</option>
+                <option value="Verdana" style="font-family:Verdana">Verdana</option>
+                <option value="Vivaldi" style="font-family:Vivaldi">Vivaldi</option>
+                <option value="Goudy Old Style" style="font-family:Goudy Old Style">Goudy Old Style</option>
+            </select>
+        </td>
+        <td width="10%">
+            <!-- <em>Size:</em> -->
+            <select id="selSize" style="font-family: Verdana;" >
+                <option value="100">100px</option>
+                <option value="90">90px</option>
+                <option value="80">80px</option>
+                <option value="70">70px</option>
+                <option value="60">60px</option>
+                <option value="50">50px</option>
+                <option value="40">40px</option>
+                <option value="30">30px</option>
+                <option value="20">20px</option>
+                <option value="10">10px</option>
+            </select>
+        </td>
+        <td width="10%">
+            <select id="selAxis" style="font-family: Verdana;" onchange="_rotationAxis=this.value;">
+                <option value="-">stop</option>
+                <option value="x">X</option>
+                <option value="y">Y</option>
+                <option value="z">Z</option>
+            </select></td>
+        <td width="10%">
+            <select id="selBackgroundColor" style="color:#FFFFFF" onchange="_changeBackgroundColor(this.value);">
+                <option value="#FFFFFF" style="color:#FFFFFF">White</option>
+                <option value="#C0C0C0" style="color:#C0C0C0">Silver</option>
+                <option value="#808080" style="color:#808080">Gray</option>
+                <option value="#000000" style="color:#000000">Black</option>
+                <option value="#FF0000" style="color:#FF0000">Red</option>
+                <option value="#800000" style="color:#800000">Maroon</option>
+                <option value="#FFFF00" style="color:#FFFF00">Yellow</option>
+                <option value="#808000" style="color:#808000">Olive</option>
+                <option value="#00FF00" style="color:#00FF00">Lime</option>
+                <option value="#008000" style="color:#008000">Green</option>
+                <option value="#00FFFF" style="color:#00FFFF">Aqua</option>
+                <option value="#008080" style="color:#008080">Teal</option>
+                <option value="#0000FF" style="color:#0000FF">Blue</option>
+                <option value="#000080" style="color:#000080">Navy</option>
+                <option value="#FF00FF" style="color:#FF00FF">Fuchsia</option>
+                <option value="#800080" style="color:#800080">Purple</option>
+            </select>
+        </td>
+        <td width="10%">
+            <input id="butVectorize" type="button" value="GO!" style="font-weight:bold;background-color:Lime"></input>
+        </td>
+      </tr>
+    </table>
+
+<div style="display:none">
+    
+    <br>
+    <strong>Thickness</strong> [in 3D]<br>
+    <input id="txtThick" value="10" style="width:70px">
+    <em>Throughout: </em><input type="checkbox" id="chkThroughout">
+    <em>Stroke: </em><input type="checkbox" id="chkStroke">
+    <br>
+    <br>
+    <strong>Font</strong>
+    <br>
+    <em>Style:</em><select id="selStyle" onchange="this.style.fontStyle=this.value">
+    <option style="font-style:normal" value="normal">normal</option>
+    <option style="font-style:italic" value="italic">italic</option>
+    <option style="font-style:oblique" value="oblique">oblique</option>
+</select>
+<em>Variant:</em><select id="selVariant" onchange="this.style.fontVariant=this.value">
+<option style="font-variant:normal" value="normal">normal</option>
+<option style="font-variant:small-caps" value="small-caps">small-caps</option>
+</select>
+<em>Weight:</em><select id="selWeight" onchange="this.style.fontWeight=this.value">
+<option style="font-weight:normal" value="normal">normal</option>
+<option style="font-weight:bold" value="bold">bold</option>
+<option style="font-weight:bolder" value="bolder">bolder</option>
+<option style="font-weight:lighter" value="lighter">lighter</option>
+</select>
+
+
+<br>
+<hr>
+<br>
+
+
+<em>Color: </em>
+<select id="selColor" style="color:#FFFFFF" onchange="this.style.color=this.value;_material.diffuseColor=BABYLON.Color3.FromHexString(this.value)">
+<option value="#FFFFFF" style="color:#FFFFFF">███████ White</option>
+<option value="#C0C0C0" style="color:#C0C0C0">███████ Silver</option>
+<option value="#808080" style="color:#808080">███████ Gray</option>
+<option value="#000000" style="color:#000000">███████ Black</option>
+<option value="#FF0000" style="color:#FF0000">███████ Red</option>
+<option value="#800000" style="color:#800000">███████ Maroon</option>
+<option value="#FFFF00" style="color:#FFFF00">███████ Yellow</option>
+<option value="#808000" style="color:#808000">███████ Olive</option>
+<option value="#00FF00" style="color:#00FF00">███████ Lime</option>
+<option value="#008000" style="color:#008000">███████ Green</option>
+<option value="#00FFFF" style="color:#00FFFF">███████ Aqua</option>
+<option value="#008080" style="color:#008080">███████ Teal</option>
+<option value="#0000FF" style="color:#0000FF">███████ Blue</option>
+<option value="#000080" style="color:#000080">███████ Navy</option>
+<option value="#FF00FF" style="color:#FF00FF">███████ Fuchsia</option>
+<option value="#800080" style="color:#800080">███████ Purple</option>
+</select>
+<em>Wireframe:</em><input type="checkbox" id="chkWireframe" onchange="_material.wireframe=this.checked">
+<br>
+<br>
+
+</div>
+
+<script src="./js/lib/3dtext.js"></script>
+</body>
+</html>
